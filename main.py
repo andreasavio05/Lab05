@@ -36,7 +36,15 @@ def main(page: ft.Page):
     lista_auto = ft.ListView(expand=True, spacing=5, padding=10, auto_scroll=True)
 
     # Tutti i TextField per le info necessarie per aggiungere una nuova automobile (marca, modello, anno, contatore posti)
-    # TODO
+
+    text_aggiungi = ft.Text('Aggiungi nuova automobile', size = 20, text_align=ft.TextAlign.CENTER)
+
+    text_marca = ft.TextField(value = 'Marca', width = 200, text_size = 15)
+    text_modello = ft.TextField(value = 'Modello', width = 200, text_size = 15)
+    text_anno = ft.TextField(value = 'Anno', width = 200, text_size = 15)
+
+    contatore = ft.TextField(width = 60, text_size = 15)
+    contatore.value = 0
 
     # --- FUNZIONI APP ---
     def aggiorna_lista_auto():
@@ -58,14 +66,51 @@ def main(page: ft.Page):
         page.update()
 
     # Handlers per la gestione dei bottoni utili all'inserimento di una nuova auto
-    # TODO
+
+    def handlerMinus(e):
+        currentVal = contatore.value
+        if currentVal > 0:
+            currentVal -= 1
+            contatore.value = currentVal
+            page.update()
+
+    def handlerPlus(e):
+        currentVal = contatore.value
+        currentVal += 1
+        contatore.value = currentVal
+        page.update()
+
+    btnMinus = ft.IconButton(icon = ft.Icons.REMOVE, icon_size = 20, icon_color = 'red', on_click = handlerMinus)
+
+    btnPlus = ft.IconButton(icon = ft.Icons.ADD, icon_size = 20, icon_color = 'green', on_click = handlerPlus)
 
     # --- EVENTI ---
     toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=cambia_tema)
     pulsante_conferma_responsabile = ft.ElevatedButton("Conferma", on_click=conferma_responsabile)
 
     # Bottoni per la gestione dell'inserimento di una nuova auto
-    # TODO
+
+    def handler_aggiungi_auto(e):
+        if text_anno.value.isdigit():
+            marca = text_marca.value
+            modello = text_modello.value
+            anno = int(text_anno.value)
+            posti = int(contatore.value)
+
+            autonoleggio.aggiungi_automobile(marca, modello, anno, posti)
+
+            text_marca.value = ''
+            text_modello.value = ''
+            text_anno.value = ''
+            contatore.value = 0
+
+            aggiorna_lista_auto()
+            page.update()
+
+        else:
+            alert.show_alert("Inserisci un numero valido per l'anno!")
+
+    bottone = ft.ElevatedButton('Aggiungi automobile', animate_size = 24, on_click = handler_aggiungi_auto)
 
     # --- LAYOUT ---
     page.add(
@@ -83,7 +128,10 @@ def main(page: ft.Page):
                alignment=ft.MainAxisAlignment.CENTER),
 
         # Sezione 3
-        # TODO
+        text_aggiungi,
+        ft.Row([text_marca, text_modello, text_anno, btnMinus, contatore, btnPlus], alignment=ft.MainAxisAlignment.CENTER),
+        bottone,
+
 
         # Sezione 4
         ft.Divider(),
